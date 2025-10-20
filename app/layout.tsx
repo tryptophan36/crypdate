@@ -25,9 +25,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} dark antialiased bg-[radial-gradient(65%_65%_at_50%_0%,rgba(99,102,241,0.15),transparent_60%),radial-gradient(45%_45%_at_100%_0%,rgba(16,185,129,0.12),transparent_60%),radial-gradient(40%_40%_at_0%_100%,rgba(244,63,94,0.12),transparent_60%)]`}
       >
-        {children}
+        <div className="relative min-h-dvh">
+          <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:36px_36px] opacity-30" />
+          <div className="relative z-10">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
