@@ -42,7 +42,7 @@ const mockEvidence: Evidence[] = [
 
 // Main dashboard component
 export default function CryptoAssistant() {
-  const [tokens, setTokens] = useState<Token[]>(mockTokens)
+  const [tokens] = useState<Token[]>(mockTokens)
   const [selectedToken, setSelectedToken] = useState<Token | null>(null)
   const [followInput, setFollowInput] = useState("")
   const [activeTab, setActiveTab] = useState("dashboard")
