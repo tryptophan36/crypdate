@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import { pool, query } from "./db";
+import {  query } from "./db";
 import { verifyInitData } from "./telegramVerify";
 
 dotenv.config();
@@ -38,10 +38,15 @@ function authMiddleware(req: express.Request, res: express.Response, next: expre
   if (parts.length !== 2) return res.status(401).json({ ok: false, error: "unauth" });
   const token = parts[1];
   try {
-    const payload: any = jwt.verify(token, JWT_SECRET);
-    (req as any).userId = String(payload.sub);
+    const payload: { sub: string } = jwt.verify(token, JWT_SECRET) as { sub: string };
+    (req as unknown as { userId: string }).userId = String(payload.sub);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      console.error("authMiddleware error", e.message);
+    } else {
+      console.error("authMiddleware error", e);
+    }
     return res.status(401).json({ ok: false, error: "invalid_token" });
   }
 }
@@ -80,9 +85,9 @@ app.post("/api/verify-init", async (req, res) => {
  * Returns watchlist for authenticated user
  */
 app.get("/api/user/watchlist", authMiddleware, async (req, res) => {
-  const userId = (req as any).userId as string;
+  const userId = (req as unknown as { userId: string }).userId;
   const r = await query("SELECT token_symbol FROM watchlists WHERE user_id = $1 ORDER BY created_at DESC", [userId]);
-  const list = r.rows.map((r: any) => r.token_symbol);
+  const list = r.rows.map((r: { token_symbol: string }) => r.token_symbol);
   res.json({ ok: true, watchlist: list });
 });
 
@@ -91,7 +96,7 @@ app.get("/api/user/watchlist", authMiddleware, async (req, res) => {
  * body: { token: string }
  */
 app.post("/api/user/follow", authMiddleware, async (req, res) => {
-  const userId = (req as any).userId as string;
+  const userId = (req as unknown as { userId: string }).userId;
   const { token } = req.body;
   if (!token) return res.status(400).json({ ok: false, error: "missing token" });
   const sym = String(token).trim().toUpperCase();
