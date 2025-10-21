@@ -10,7 +10,7 @@ export function verifyInitData(initData: string, botToken: string): boolean {
   const parts = initData.split("&");
   const hashPart = parts.find(p => p.startsWith("hash="));
   if (!hashPart) return false;
-  const hash = decodeURIComponent(hashPart.split("=")[1]);
+  const hash = decodeURIComponent(hashPart.split("=")[1] || "");
 
   const dataCheckArray = parts.filter(p => !p.startsWith("hash=")).sort();
   const dataCheckString = dataCheckArray.join("\n");
