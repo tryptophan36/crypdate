@@ -3,8 +3,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import {  query } from "./db";
-import { verifyInitData } from "./telegramVerify";
+import {  query } from "./db.js";
+import { verifyInitData } from "./telegramVerify.js";
 
 dotenv.config();
 
@@ -15,7 +15,7 @@ app.use(cors({
 }));
 
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
+const JWT_SECRET: string = process.env.JWT_SECRET || "dev_secret";
 
 /**
  * Helper: parse initData query-string into object
@@ -24,7 +24,9 @@ function parseInitData(initData: string) {
   const obj: Record<string, string> = {};
   initData.split("&").forEach(pair => {
     const [k, v] = pair.split("=");
-    obj[k] = decodeURIComponent(v || "");
+    if (k) {
+      obj[k] = decodeURIComponent(v || "");
+    }
   });
   return obj;
 }
@@ -37,10 +39,15 @@ function authMiddleware(req: express.Request, res: express.Response, next: expre
   const parts = auth.split(" ");
   if (parts.length !== 2) return res.status(401).json({ ok: false, error: "unauth" });
   const token = parts[1];
+  if (!token) return res.status(401).json({ ok: false, error: "unauth" });
   try {
-    const payload: { sub: string } = jwt.verify(token, JWT_SECRET) as { sub: string };
-    (req as unknown as { userId: string }).userId = String(payload.sub);
-    next();
+    const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
+    if (payload && payload.sub) {
+      (req as unknown as { userId: string }).userId = String(payload.sub);
+      next();
+    } else {
+      return res.status(401).json({ ok: false, error: "invalid_token" });
+    }
   } catch (e: unknown) {
     if (e instanceof Error) {
       console.error("authMiddleware error", e.message);
