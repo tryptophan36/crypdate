@@ -63,7 +63,7 @@ export default function CryptoAssistant() {
             <h1 className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">CryptoAssistant</h1>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 max-w-3xl mx-auto">
             <input
               type="text"
               placeholder="Follow token..."
@@ -83,7 +83,7 @@ export default function CryptoAssistant() {
       </header>
 
       {/* Token List */}
-      <main className="flex-1 overflow-y-auto px-4 py-4 pb-28 space-y-3">
+      <main className="flex-1 max-w-3xl mx-auto overflow-y-auto px-4 py-4 pb-28 space-y-3">
         {tokens.map((token) => (
           <TokenCard key={token.id} token={token} onViewEvidence={setSelectedToken} />
         ))}
